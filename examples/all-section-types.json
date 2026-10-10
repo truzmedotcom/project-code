@@ -1,0 +1,44 @@
+{
+  "$schema": "https://www.truzme.com/schemas/project-code/v1.json",
+  "units": {
+    "length": "m",
+    "sectionLength": "mm",
+    "force": "kN",
+    "materialStrength": "MPa",
+    "area": "mm²",
+    "density": "kg/m³"
+  },
+  "nodes": [
+    { "id": 1, "x": 0, "y": 0 },
+    { "id": 2, "x": 2, "y": 2 },
+    { "id": 3, "x": 4, "y": 0 },
+    { "id": 4, "x": 6, "y": 2 },
+    { "id": 5, "x": 8, "y": 0 }
+  ],
+  "members": [
+    { "id": 1, "from": 1, "to": 3, "section": 1, "material": 1 },
+    { "id": 2, "from": 3, "to": 5, "section": 2, "material": 1 },
+    { "id": 3, "from": 2, "to": 4, "section": 3, "material": 1 },
+    { "id": 4, "from": 1, "to": 2, "section": 4, "material": 1 },
+    { "id": 5, "from": 2, "to": 3, "section": 5, "material": 1 },
+    { "id": 6, "from": 3, "to": 4, "section": 1, "material": 1 },
+    { "id": 7, "from": 4, "to": 5, "section": 2, "material": 1 }
+  ],
+  "supports": [
+    { "id": 1, "node": 1, "x": true, "y": true },
+    { "id": 2, "node": 5, "x": false, "y": true }
+  ],
+  "nodalLoads": [
+    { "id": 1, "node": 3, "x": 0, "y": -5 }
+  ],
+  "materials": [
+    { "id": 1, "name": "Steel", "EModulus": 210000, "fMax": 235, "density": 7850 }
+  ],
+  "sections": [
+    { "id": 1, "name": "Ø20", "sectionType": "solid_round", "d": 20 },
+    { "id": 2, "name": "Pipe 48.3×3.2", "sectionType": "pipe", "outerDiameter": 48.3, "thickness": 3.2 },
+    { "id": 3, "name": "60×40", "sectionType": "rectangle", "w": 60, "h": 40 },
+    { "id": 4, "name": "40×40×3", "sectionType": "hollow_rectangle", "w": 40, "h": 40, "thickness": 3 },
+    { "id": 5, "name": "Custom", "sectionType": "custom", "area": 450, "Imin": 120000 }
+  ]
+}

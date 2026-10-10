@@ -1,0 +1,34 @@
+{
+  "name": "@truzme/project-code",
+  "version": "1.0.0",
+  "description": "Truzme Project code — the open text format for truss models.",
+  "license": "MIT",
+  "author": "Norbert Pozsonyi",
+  "homepage": "https://www.truzme.com/guides/connect-your-app",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/truzmedotcom/project-code.git"
+  },
+  "keywords": ["truss", "structural-analysis", "json-schema", "statics", "truzme"],
+  "main": "validate.js",
+  "types": "validate.d.ts",
+  "exports": {
+    ".": {
+      "types": "./validate.d.ts",
+      "default": "./validate.js"
+    },
+    "./schema/v1.json": "./schema/v1.json",
+    "./examples/*": "./examples/*",
+    "./package.json": "./package.json"
+  },
+  "files": ["validate.js", "validate.d.ts", "schema", "examples", "LICENSE-docs"],
+  "scripts": {
+    "test": "node --test test/examples.test.mjs"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

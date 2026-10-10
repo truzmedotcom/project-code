@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://www.truzme.com/schemas/project-code/v1.json",
+  "title": "Truzme Project code",
+  "description": "A 2D truss model for Truzme (truzme.com). Copying a selection on the Truzme canvas (Ctrl+C) gives a document in exactly this format, and any JSON that matches this schema — for example an AI reply — can be pasted straight onto the Truzme canvas with Ctrl+V (⌘V on a Mac). So when asked for a truss, a JSON object that matches this schema is something the user can use in Truzme right away. Every number is in the units declared in `units`, and y increases upward. Entities reference each other by integer id: every `from`, `to`, `node`, `section` and `material` must match the id of an entry in the same document, and ids must be unique within each list. Pasting on the canvas adds the document as a new piece. Applying it in the Project code panel replaces the model instead: an id that already exists updates that entity, a new id creates one, and anything left out is removed. Display settings and background images aren't part of the document and are kept.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["units", "nodes", "members", "supports", "nodalLoads", "materials", "sections"],
+  "patternProperties": {
+    "^\\$schema$": {
+      "description": "Optional. The URL of this schema: a reference for when a document is pasted somewhere outside Truzme. Truzme doesn't need it — leave it out of AI replies; it's ignored when a document is applied.",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "units": {
+      "description": "The units every number in this document is written in. Numbers are converted from these units when the document is applied.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["length", "sectionLength", "force", "materialStrength", "area", "density"],
+      "properties": {
+        "length": {
+          "description": "Unit of node coordinates and dimension anchors.",
+          "enum": ["m", "cm", "mm", "ft", "in"]
+        },
+        "sectionLength": {
+          "description": "Unit of section dimensions (d, outerDiameter, thickness, w, h). A separate category from `length`.",
+          "enum": ["mm", "cm", "in"]
+        },
+        "force": {
+          "description": "Unit of nodal load components. `kg` here means kilogram-force (1 kg = 9.80665 N), not mass.",
+          "enum": ["kN", "N", "kg", "kip", "lbf"]
+        },
+        "materialStrength": {
+          "description": "Unit of a material's EModulus and fMax.",
+          "enum": ["MPa", "N/mm²", "GPa", "ksi", "psi"]
+        },
+        "area": {
+          "description": "Unit of a custom section's area. Its Imin uses the matching fourth-power unit: mm² → mm⁴, cm² → cm⁴, in² → in⁴, ft² → ft⁴.",
+          "enum": ["mm²", "cm²", "in²", "ft²"]
+        },
+        "density": { "description": "Unit of material density.", "enum": ["kg/m³", "lb/ft³"] }
+      }
+    },
+    "nodes": {
+      "description": "The joints of the truss. Ids are unique integers within this list.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "x", "y"],
+        "properties": {
+          "id": { "type": "integer" },
+          "x": { "description": "Horizontal position in `units.length`. Increases to the right.", "type": "number" },
+          "y": {
+            "description": "Vertical position in `units.length`. Increases upward — not screen coordinates.",
+            "type": "number"
+          }
+        }
+      }
+    },
+    "members": {
+      "description": "Straight bars between two nodes. A member must join two different nodes — `from` and `to` can't be the same. Ids are unique integers within this list.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "from", "to", "section", "material"],
+        "properties": {
+          "id": { "type": "integer" },
+          "from": { "description": "Id of the node at one end.", "type": "integer" },
+          "to": { "description": "Id of the node at the other end.", "type": "integer" },
+          "section": { "description": "Id of an entry in `sections`.", "type": "integer" },
+          "material": { "description": "Id of an entry in `materials`.", "type": "integer" }
+        }
+      }
+    },
+    "supports": {
+      "description": "Restraints that hold nodes in place. A pin fixes both x and y; a roller fixes only one of them. Ids are unique integers within this list.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "node", "x", "y"],
+        "properties": {
+          "id": { "type": "integer" },
+          "node": { "description": "Id of the restrained node.", "type": "integer" },
+          "x": { "description": "true = the node can't move horizontally.", "type": "boolean" },
+          "y": { "description": "true = the node can't move vertically.", "type": "boolean" }
+        }
+      }
+    },
+    "nodalLoads": {
+      "description": "Point forces acting on nodes. Ids are unique integers within this list.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "node", "x", "y"],
+        "properties": {
+          "id": { "type": "integer" },
+          "node": { "description": "Id of the loaded node.", "type": "integer" },
+          "x": {
+            "description": "Horizontal force component in `units.force`. Positive points right.",
+            "type": "number"
+          },
+          "y": {
+            "description": "Vertical force component in `units.force`. Positive points up, so gravity loads are negative.",
+            "type": "number"
+          },
+          "mode": {
+            "description": "Optional, and only changes how the load's arrow is drawn — the analysis is the same. Leave it out for `push`, where the arrow points at the node. Use `pull` for a load hanging from the truss, such as a downward load on a bottom chord node: the arrow then starts at the node and points away, instead of being drawn across the truss's members.",
+            "enum": ["push", "pull"]
+          }
+        }
+      }
+    },
+    "materials": {
+      "description": "The material library. Must contain at least one material, even if no member uses it. Ids are unique integers within this list.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name", "EModulus", "fMax", "density"],
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "EModulus": {
+            "description": "Young's modulus (stiffness) in `units.materialStrength`.",
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "fMax": {
+            "description": "Strength limit in `units.materialStrength`. The strength check compares member stress to this.",
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "density": {
+            "description": "Mass per volume in `units.density`. Only affects the total mass, not the analysis.",
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "color": { "$ref": "#/$defs/color" }
+        }
+      }
+    },
+    "sections": {
+      "description": "The cross-section library. Must contain at least one section. Which size fields a section has depends on `sectionType`. Ids are unique integers within this list.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "sectionType"],
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "sectionType": {
+            "description": "solid_round: d. pipe: outerDiameter, thickness. rectangle: w, h. hollow_rectangle: w, h, thickness. custom: area, Imin. Area and Imin of the first four are computed from their dimensions — don't add them.",
+            "enum": ["solid_round", "pipe", "rectangle", "hollow_rectangle", "custom"]
+          }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "sectionType": { "const": "solid_round" } }, "required": ["sectionType"] },
+            "then": { "$ref": "#/$defs/solidRoundSection" }
+          },
+          {
+            "if": { "properties": { "sectionType": { "const": "pipe" } }, "required": ["sectionType"] },
+            "then": { "$ref": "#/$defs/pipeSection" }
+          },
+          {
+            "if": { "properties": { "sectionType": { "const": "rectangle" } }, "required": ["sectionType"] },
+            "then": { "$ref": "#/$defs/rectangleSection" }
+          },
+          {
+            "if": { "properties": { "sectionType": { "const": "hollow_rectangle" } }, "required": ["sectionType"] },
+            "then": { "$ref": "#/$defs/hollowRectangleSection" }
+          },
+          {
+            "if": { "properties": { "sectionType": { "const": "custom" } }, "required": ["sectionType"] },
+            "then": { "$ref": "#/$defs/customSection" }
+          }
+        ]
+      }
+    },
+    "dimensions": {
+      "description": "Optional measurement lines between two nodes. Leaving the key out is the same as an empty list.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/dimension" }
+    }
+  },
+  "$defs": {
+    "solidRoundSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "sectionType", "d"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "sectionType": { "const": "solid_round" },
+        "d": { "description": "Diameter in `units.sectionLength`.", "type": "number", "exclusiveMinimum": 0 },
+        "color": { "$ref": "#/$defs/color" }
+      }
+    },
+    "pipeSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "sectionType", "outerDiameter", "thickness"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "sectionType": { "const": "pipe" },
+        "outerDiameter": {
+          "description": "Outer diameter in `units.sectionLength`.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "thickness": {
+          "description": "Wall thickness in `units.sectionLength`.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "color": { "$ref": "#/$defs/color" }
+      }
+    },
+    "rectangleSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "sectionType", "w", "h"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "sectionType": { "const": "rectangle" },
+        "w": { "description": "Width in `units.sectionLength`.", "type": "number", "exclusiveMinimum": 0 },
+        "h": { "description": "Height in `units.sectionLength`.", "type": "number", "exclusiveMinimum": 0 },
+        "color": { "$ref": "#/$defs/color" }
+      }
+    },
+    "hollowRectangleSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "sectionType", "w", "h", "thickness"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "sectionType": { "const": "hollow_rectangle" },
+        "w": { "description": "Outer width in `units.sectionLength`.", "type": "number", "exclusiveMinimum": 0 },
+        "h": { "description": "Outer height in `units.sectionLength`.", "type": "number", "exclusiveMinimum": 0 },
+        "thickness": {
+          "description": "Wall thickness in `units.sectionLength`.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "color": { "$ref": "#/$defs/color" }
+      }
+    },
+    "customSection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "sectionType", "area", "Imin"],
+      "properties": {
+        "id": { "type": "integer" },
+        "name": { "type": "string" },
+        "sectionType": { "const": "custom" },
+        "area": {
+          "description": "Cross-section area in `units.area`.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "Imin": {
+          "description": "Smallest second moment of area, in the fourth-power unit matching `units.area`. The buckling check uses it.",
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "color": { "$ref": "#/$defs/color" }
+      }
+    },
+    "color": {
+      "description": "Optional hex color, e.g. \"#1D4ED8\". Leave it out to keep an existing entity's color.",
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6}$"
+    },
+    "dimension": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "from", "to", "kind", "anchor"],
+      "properties": {
+        "id": { "type": "integer" },
+        "from": { "description": "Id of the node the line measures from.", "type": "integer" },
+        "to": { "description": "Id of the node the line measures to.", "type": "integer" },
+        "kind": {
+          "description": "What the line measures between its two nodes: `horizontal` the distance along x, `vertical` the distance along y, `angle` the straight distance, drawn slanted parallel to the two nodes. All three show a length; `angle` does not measure degrees.",
+          "enum": ["horizontal", "vertical", "angle"]
+        },
+        "anchor": {
+          "description": "A point the line is drawn through, in `units.length` — it sets how far the line sits from what it measures. A `horizontal` line is drawn at the anchor's y, a `vertical` line at the anchor's x, and an `angle` line through the anchor. Moving a node leaves the line where it is.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["x", "y"],
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" }
+          }
+        }
+      }
+    }
+  }
+}

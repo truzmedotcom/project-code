@@ -1,0 +1,34 @@
+{
+  "$schema": "https://www.truzme.com/schemas/project-code/v1.json",
+  "units": {
+    "length": "m",
+    "sectionLength": "mm",
+    "force": "kN",
+    "materialStrength": "MPa",
+    "area": "mm²",
+    "density": "kg/m³"
+  },
+  "nodes": [
+    { "id": 1, "x": 0, "y": 0 },
+    { "id": 2, "x": 4, "y": 0 },
+    { "id": 3, "x": 2, "y": 3 }
+  ],
+  "members": [
+    { "id": 1, "from": 1, "to": 2, "section": 1, "material": 1 },
+    { "id": 2, "from": 1, "to": 3, "section": 1, "material": 1 },
+    { "id": 3, "from": 2, "to": 3, "section": 1, "material": 1 }
+  ],
+  "supports": [
+    { "id": 1, "node": 1, "x": true, "y": true },
+    { "id": 2, "node": 2, "x": false, "y": true }
+  ],
+  "nodalLoads": [
+    { "id": 1, "node": 3, "x": 0, "y": -10 }
+  ],
+  "materials": [
+    { "id": 1, "name": "Steel", "EModulus": 210000, "fMax": 235, "density": 7850 }
+  ],
+  "sections": [
+    { "id": 1, "name": "Ø20", "sectionType": "solid_round", "d": 20 }
+  ]
+}
