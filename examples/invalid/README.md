@@ -16,3 +16,4 @@ one of them.
 | `missing-unit.json`               | `units` has no `density`. All six unit fields are required.           |
 | `unsupported-unit.json`           | `yd` isn't one of the allowed length units.                           |
 | `bad-color.json`                  | `blue` isn't a color in `#RRGGBB` form.                               |
+| `angle-not-a-number.json`         | Support 2's `angle` is the text `"30"`, not a number.                 |

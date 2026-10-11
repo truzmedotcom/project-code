@@ -63,12 +63,41 @@ A triangle with two supports and one load:
 
 Copy it, then paste it on the Truzme canvas (Ctrl+V, ⌘V on a Mac) to see it.
 
+## Writing a document
+
+What every document needs:
+
+- **All six `units` fields**, even the ones your model doesn't use.
+- **Integer ids, unique within each list.** Node 1 and section 1 don't collide.
+- **References by id.** Everything that points at something (`from`, `to`, `node`, `section`, `material`) uses an id
+  from the same document.
+- **At least one material and one section.**
+- **Two different nodes per member.**
+- **`y` increases upward**, the math convention, not screen coordinates.
+- **A vertical roller** can be written as `{ "x": true, "y": false }`, or as a roller turned by −90:
+  `{ "x": false, "y": true, "angle": -90 }`. Leave `angle` out unless a support really is turned.
+- **No keys of your own.** The format doesn't allow keys it doesn't define. Need one? See [Proposals](#proposals).
+
+## Reading a document
+
+- **The `units` block is authoritative.** Convert every number from the document's units into your own. Don't assume
+  meters or newtons.
+- **A load's `mode` is only for drawing.** `push` (the default) draws the arrow pointing at the node, `pull` draws it
+  pointing away. The force is the same either way.
+- **`color` and `dimensions` are optional.** Don't require them.
+- **A support's `angle` turns it**, in degrees, counterclockwise, and its `x` / `y` directions turn with it: a roller
+  with `"y": true` and `"angle": 30` holds the node only across a surface tilted 30°. On a pin it only changes the
+  drawing. Missing means 0.
+- **`$schema` may be there.** Ignore it.
+- **Check references.** The schema checks the shape of a document, not that an id points at something. `validate`
+  (below) does both.
+
 ## Check that you're compatible
 
 Install from GitHub, pinned to a version:
 
 ```sh
-npm install github:truzmedotcom/project-code#v1.0.0
+npm install github:truzmedotcom/project-code#v1.1.0
 ```
 
 ```js
@@ -96,8 +125,19 @@ If your tool supports the format, please call it "Truzme Project code" and link 
 
 ## Versioning
 
-Version 1 is stable. A change that would break existing documents or tools gets a new schema address (`…/v2.json`),
-and version 1 stays available at its address.
+The format follows [semantic versioning](https://semver.org/):
+
+- **A backward-compatible change stays version 1**, at the same address, as a new minor version (1.1, 1.2, …): a new
+  optional key, for example. Every document that was valid stays valid and means the same.
+- **A breaking change gets version 2**, at a new address (`…/v2.json`): removing or renaming a key, or changing what one
+  means. Version 1 stays available at its address.
+
+Every object in the schema rejects keys it doesn't define, so a tool holding an older copy of version 1 rejects a
+document that uses a newer optional key. Validate against the address above, or update your copy with each release.
+Truzme writes a new key only where it's actually used — a support's `angle` only on a turned support — so documents
+that don't use a feature stay readable by older copies.
+
+[CHANGELOG.md](CHANGELOG.md) lists what changed in each release.
 
 ## Proposals
 
@@ -106,7 +146,5 @@ Need something the format can't express? Proposals welcome via issues; Truzme de
 
 ## License
 
-- Schema, examples and code: [MIT](LICENSE).
-- This README and other prose: [CC BY 4.0](LICENSE-docs).
-
-The licenses cover the schema, the examples, the code and the docs. They don't cover the Truzme name or logo.
+Everything in this repo — the schema, the examples, the code and the docs — is under the [MIT license](LICENSE). It
+doesn't cover the Truzme name or logo.

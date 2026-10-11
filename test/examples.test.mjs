@@ -31,3 +31,13 @@ test('every invalid example has its reason in examples/invalid/README.md', () =>
     const listed = [...readme.matchAll(/^\| `([^`]+\.json)` +\| \S/gm)].map((match) => match[1]);
     assert.deepEqual(listed.sort(), jsonFiles(INVALID).sort());
 });
+
+test("the schema's $comment names this release's version", () => {
+    const schema = JSON.parse(readFileSync(new URL('../schema/v1.json', import.meta.url), 'utf8'));
+    const { version } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+    assert.ok(
+        schema.$comment.startsWith(`Truzme Project code ${version}.`),
+        `$comment should start with "Truzme Project code ${version}." — update it with each release`
+    );
+});
+

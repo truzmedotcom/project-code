@@ -1,6 +1,6 @@
 {
   "name": "@truzme/project-code",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Truzme Project code — the open text format for truss models.",
   "license": "MIT",
   "author": "Norbert Pozsonyi",
@@ -21,7 +21,7 @@
     "./examples/*": "./examples/*",
     "./package.json": "./package.json"
   },
-  "files": ["validate.js", "validate.d.ts", "schema", "examples", "LICENSE-docs"],
+  "files": ["validate.js", "validate.d.ts", "schema", "examples"],
   "scripts": {
     "test": "node --test test/examples.test.mjs"
   },

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.0 — 2026-10-11
+
+- Supports can be turned: an optional `angle` (degrees, counterclockwise). A support's `x` / `y` directions turn with
+  it; on a pin it only changes the drawing. Backward compatible: without `angle`, every support means what it did.
+- The `x` / `y` descriptions say they follow the support's angle.
+- `examples/rotated-supports.json`, and `examples/invalid/angle-not-a-number.json`.
+- The schema's `$comment` names its release (`Truzme Project code 1.1.0.`), so a copy of `v1.json` says which
+  version it is. Validators ignore it.
+- README: how to write and read a document, and how versions work.
+- One license for the whole repo: MIT, docs included (`LICENSE-docs` removed).
+
 ## 1.0.0 — 2026-10-10
 
 First public release.

@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://www.truzme.com/schemas/project-code/v1.json",
+  "$comment": "Truzme Project code 1.1.0. What changed in each release: https://github.com/truzmedotcom/project-code/blob/main/CHANGELOG.md",
   "title": "Truzme Project code",
   "description": "A 2D truss model for Truzme (truzme.com). Copying a selection on the Truzme canvas (Ctrl+C) gives a document in exactly this format, and any JSON that matches this schema — for example an AI reply — can be pasted straight onto the Truzme canvas with Ctrl+V (⌘V on a Mac). So when asked for a truss, a JSON object that matches this schema is something the user can use in Truzme right away. Every number is in the units declared in `units`, and y increases upward. Entities reference each other by integer id: every `from`, `to`, `node`, `section` and `material` must match the id of an entry in the same document, and ids must be unique within each list. Pasting on the canvas adds the document as a new piece. Applying it in the Project code panel replaces the model instead: an id that already exists updates that entity, a new id creates one, and anything left out is removed. Display settings and background images aren't part of the document and are kept.",
   "type": "object",
@@ -85,8 +86,18 @@
         "properties": {
           "id": { "type": "integer" },
           "node": { "description": "Id of the restrained node.", "type": "integer" },
-          "x": { "description": "true = the node can't move horizontally.", "type": "boolean" },
-          "y": { "description": "true = the node can't move vertically.", "type": "boolean" }
+          "x": {
+            "description": "true = the node can't move horizontally (along the support's own x direction when it has an angle).",
+            "type": "boolean"
+          },
+          "y": {
+            "description": "true = the node can't move vertically (along the support's own y direction when it has an angle).",
+            "type": "boolean"
+          },
+          "angle": {
+            "description": "Optional, in degrees, counterclockwise. Turns the support, its x and y directions with it: a roller with y: true and angle: 30 stands on a surface tilted 30° and holds the node across that surface only. On a pin it only changes how it's drawn. Leave it out for 0, how supports are drawn by default.",
+            "type": "number"
+          }
         }
       }
     },

@@ -11,7 +11,8 @@ Need something the format can't express? Open an issue first, before writing any
 - **What a tool that doesn't know the new field should do** with a document that has it.
 
 Proposals are welcome. Truzme decides what goes into the spec, so documents stay readable by every tool that supports
-it.
+it. An extension that doesn't break existing documents goes into version 1 as a new minor version; one that would
+break them waits for version 2 (see [Versioning](README.md#versioning)).
 
 Please don't add your own keys to documents in the meantime. The format doesn't allow keys it doesn't define, so other
 tools will reject them.
@@ -25,5 +26,4 @@ checks for it.
 
 ## License of contributions
 
-By contributing, you agree that your contribution is licensed like the rest of the repo: [MIT](LICENSE) for the
-schema, examples and code, and [CC BY 4.0](LICENSE-docs) for the README and other prose.
+By contributing, you agree that your contribution is licensed like the rest of the repo: [MIT](LICENSE).
