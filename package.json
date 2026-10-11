@@ -9,6 +9,9 @@
     "type": "git",
     "url": "git+https://github.com/truzmedotcom/project-code.git"
   },
+  "bugs": {
+    "url": "https://github.com/truzmedotcom/project-code/issues"
+  },
   "keywords": ["truss", "structural-analysis", "json-schema", "statics", "truzme"],
   "main": "validate.js",
   "types": "validate.d.ts",
@@ -23,12 +26,16 @@
   },
   "files": ["validate.js", "validate.d.ts", "schema", "examples"],
   "scripts": {
-    "test": "node --test test/examples.test.mjs"
+    "test": "node --test test/examples.test.mjs",
+    "prepublishOnly": "npm test"
   },
   "dependencies": {
     "ajv": "^8.17.1"
   },
   "engines": {
     "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

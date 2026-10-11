@@ -10,6 +10,7 @@
   version it is. Validators ignore it.
 - README: how to write and read a document, and how versions work.
 - One license for the whole repo: MIT, docs included (`LICENSE-docs` removed).
+- On npm as `@truzme/project-code`.
 
 ## 1.0.0 — 2026-10-10
 

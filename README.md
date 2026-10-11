@@ -94,19 +94,30 @@ What every document needs:
 
 ## Check that you're compatible
 
-Install from GitHub, pinned to a version:
+Install the package:
 
 ```sh
-npm install github:truzmedotcom/project-code#v1.1.0
+npm install @truzme/project-code
 ```
 
+Check a document:
+
 ```js
-const { validate } = require('@truzme/project-code');
+import { validate } from '@truzme/project-code'; // or: const { validate } = require('@truzme/project-code');
 
 const result = validate(JSON.parse(text));
 if (!result.valid) {
     console.log(result.errors); // e.g. "member 1 references node 9, which doesn't exist"
 }
+```
+
+The schema and the examples come with it, for your own validator or tests:
+
+```js
+import schema from '@truzme/project-code/schema/v1.json' with { type: 'json' };
+// or: const { schema } = require('@truzme/project-code');
+
+const minimal = require('@truzme/project-code/examples/minimal.json'); // CommonJS
 ```
 
 `validate` checks the schema, plus what a schema can't: that ids are unique within each list, and that every
